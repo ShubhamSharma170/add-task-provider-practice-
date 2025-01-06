@@ -9,8 +9,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController taskController = TextEditingController();
     TextEditingController editTaskController = TextEditingController();
-    List<String> priorityList = ['Low', 'Medium', 'High'];
-    String priorityName = 'Low';
+    String? _priority;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -43,6 +42,8 @@ class HomePage extends StatelessWidget {
                             return Card(
                               child: ListTile(
                                 title: Text(notCompleTask[index]['name']),
+                                subtitle:
+                                    Text(notCompleTask[index]['priority']),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -147,6 +148,7 @@ class HomePage extends StatelessWidget {
                             return Card(
                               child: ListTile(
                                 title: Text(compleTask[index]['name']),
+                                subtitle: Text(compleTask[index]['priority']),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -195,24 +197,30 @@ class HomePage extends StatelessWidget {
                       TextField(
                         controller: taskController,
                       ),
-                      // DropdownButtonFormField(
-                      //   value: priorityName,
-                      //   hint: Text('Select Priority'), // Placeholder text
-                      //   items: priorityList
-                      //       .map((e) =>
-                      //           DropdownMenuItem(value: e, child: Text(e)))
-                      //       .toList(),
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       priorityName = value!;
-                      //     });
-                      //   },
-                      //   decoration: InputDecoration(
-                      //     border:
-                      //         OutlineInputBorder(), // Dropdown ke aas paas border
-                      //     contentPadding: EdgeInsets.all(8),
-                      //   ),
-                      // )
+                      const SizedBox(height: 15),
+                      Consumer<TaskProvider>(
+                        builder: (cnt, taskProvider, child) {
+                          return DropdownButtonFormField<String>(
+                            value: taskProvider.priority,
+                            hint: const Text('Select Priority'),
+                            items: <String>['High', 'Medium', 'Low']
+                                .map((priority) => DropdownMenuItem<String>(
+                                      value: priority,
+                                      child: Text(priority),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              // Updating state in Provider
+                              taskProvider.addPriority(value!);
+                              _priority = value;
+                            },
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              contentPadding: EdgeInsets.all(8),
+                            ),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   actions: [
@@ -225,7 +233,7 @@ class HomePage extends StatelessWidget {
                             );
                           } else {
                             Provider.of<TaskProvider>(context, listen: false)
-                                .addtask(taskController.text);
+                                .addtask(taskController.text, _priority!);
                           }
                         },
                         child: const Text("Add")),
