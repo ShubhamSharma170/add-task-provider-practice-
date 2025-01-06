@@ -8,6 +8,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController taskController = TextEditingController();
+    TextEditingController editTaskController = TextEditingController();
+    List<String> priorityList = ['Low', 'Medium', 'High'];
+    String priorityName = 'Low';
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -54,6 +57,66 @@ class HomePage extends StatelessWidget {
                                             .changeStatus(originalIndex, true);
                                       },
                                     ),
+                                    IconButton(
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              editTaskController =
+                                                  TextEditingController(
+                                                      text: notCompleTask[index]
+                                                          ['name']);
+                                              return AlertDialog(
+                                                title: const Text("Edit Task"),
+                                                content: TextField(
+                                                  controller:
+                                                      editTaskController,
+                                                ),
+                                                actions: [
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        if (editTaskController
+                                                            .text
+                                                            .trim()
+                                                            .isEmpty) {
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            const SnackBar(
+                                                                content: Text(
+                                                                    "Task cannot be empty")),
+                                                          );
+                                                        } else {
+                                                          var originalIndex = value
+                                                              .getTasks()
+                                                              .indexOf(
+                                                                  notCompleTask[
+                                                                      index]);
+                                                          Provider.of<TaskProvider>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .editTask(
+                                                                  originalIndex,
+                                                                  editTaskController
+                                                                      .text
+                                                                      .trim());
+                                                        }
+                                                      },
+                                                      child:
+                                                          const Text("Edit")),
+                                                  ElevatedButton(
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child:
+                                                          const Text("Cancel")),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        icon: const Icon(Icons.edit_outlined,
+                                            color: Colors.green)),
                                     IconButton(
                                         onPressed: () {
                                           var originalIndex = value
@@ -126,8 +189,31 @@ class HomePage extends StatelessWidget {
               builder: (context) {
                 return AlertDialog(
                   title: const Text("Add Task"),
-                  content: TextField(
-                    controller: taskController,
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: taskController,
+                      ),
+                      // DropdownButtonFormField(
+                      //   value: priorityName,
+                      //   hint: Text('Select Priority'), // Placeholder text
+                      //   items: priorityList
+                      //       .map((e) =>
+                      //           DropdownMenuItem(value: e, child: Text(e)))
+                      //       .toList(),
+                      //   onChanged: (value) {
+                      //     setState(() {
+                      //       priorityName = value!;
+                      //     });
+                      //   },
+                      //   decoration: InputDecoration(
+                      //     border:
+                      //         OutlineInputBorder(), // Dropdown ke aas paas border
+                      //     contentPadding: EdgeInsets.all(8),
+                      //   ),
+                      // )
+                    ],
                   ),
                   actions: [
                     ElevatedButton(

@@ -28,4 +28,10 @@ class TaskProvider extends ChangeNotifier {
     tasks.removeAt(index);
     notifyListeners();
   }
+
+  // function for edit task
+  void editTask(int index, String name) {
+    tasks[index]['name'] = name;
+    notifyListeners();
+  }
 }
